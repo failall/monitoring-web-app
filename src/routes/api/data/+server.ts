@@ -11,15 +11,7 @@ export const GET: RequestHandler = async ({ request }) => {
 	}
 
 	try {
-		let query = `
-      SELECT 
-        timestamp,
-        temperature,
-        humidity,
-        location,
-        sensor_id
-      FROM sensor_readings
-    `;
+		let query = "SELECT timestamp, temperature, humidity, FROM sensor_readings ORDER BY timestamp DESC";
 
 		query += ` ORDER BY timestamp ASC`;
 
@@ -34,7 +26,7 @@ export const GET: RequestHandler = async ({ request }) => {
 
 		return json({ data });
 	} catch (error) {
-		console.error("InfluxDB error:", error);
+		console.error("PostgreSQL error:", error);
 		return json({ error: "Failed to fetch data" }, { status: 500 });
 	}
 };

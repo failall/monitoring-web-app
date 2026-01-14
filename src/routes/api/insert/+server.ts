@@ -20,8 +20,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const result = await pool.query(
 			`INSERT INTO sensor_readings (temperature, humidity, timestamp)
-       VALUES ($1, $2, $3, $4, NOW())
-       RETURNING id, timestamp, temperature, humidity, location, sensor_id`,
+       VALUES ($1, $2, NOW())
+       RETURNING id, timestamp, temperature, humidity`,
 			[temperature ?? null, humidity ?? null]
 		);
 
@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			message: "Data upserted"
 		});
 	} catch (error) {
-		console.error("InfluxDB error:", error);
+		console.error("PostgreSQL error:", error);
 		return json({ error: "Upsert failed" }, { status: 500 });
 	}
 };
