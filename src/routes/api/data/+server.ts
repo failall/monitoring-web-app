@@ -11,7 +11,7 @@ export const GET: RequestHandler = async ({ request }) => {
 	}
 
 	try {
-		let query = "SELECT timestamp, temperature, humidity, FROM sensor_readings ORDER BY timestamp DESC";
+		let query = "SELECT timestamp, temperature, humidity FROM sensor_readings ORDER BY timestamp DESC";
 
 		query += ` ORDER BY timestamp ASC`;
 
