@@ -137,7 +137,7 @@
 					labels: lightLabels,
 					datasets: [
 						{
-							label: "Light in Lumen",
+							label: "Light in %",
 							data: lightValues,
 							borderColor: "rgb(255, 99, 132)",
 							backgroundColor: "rgba(255, 99, 132, 0.1)",
