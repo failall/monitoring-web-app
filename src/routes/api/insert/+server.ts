@@ -12,17 +12,17 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	try {
 		const body = await request.json();
-		const { temperature, humidity } = body;
+		const { temperature, humidity, light } = body;
 
-		if (temperature === undefined && humidity === undefined) {
-			return json({ error: "Temperature or humidity required" }, { status: 400 });
+		if (temperature === undefined && humidity === undefined && light === undefined) {
+			return json({ error: "Temperature, humidity or light required" }, { status: 400 });
 		}
 
-		const result = await pool.query(
-			`INSERT INTO sensor_readings (temperature, humidity, timestamp)
-       VALUES ($1, $2, NOW())
-       RETURNING id, timestamp, temperature, humidity`,
-			[temperature ?? null, humidity ?? null]
+		await pool.query(
+			`INSERT INTO sensor_readings (temperature, humidity, light, timestamp)
+       VALUES ($1, $2, $3, NOW())
+       RETURNING id, timestamp, temperature, humidity, light`,
+			[temperature ?? null, humidity ?? null, light ?? null]
 		);
 
 		return json({

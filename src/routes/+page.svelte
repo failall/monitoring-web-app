@@ -8,8 +8,10 @@
 	let tokenInput = "";
 	let temperatureChart: Chart | null = null;
 	let humidityChart: Chart | null = null;
+  let lightChart: Chart | null = null;
 	let temperatureCanvas: HTMLCanvasElement;
 	let humidityCanvas: HTMLCanvasElement;
+  let lightCanvas: HTMLCanvasElement;
 	let pollInterval: NodeJS.Timeout;
 	let error = "";
 
@@ -57,12 +59,16 @@
 	function updateCharts(data: any[]) {
 		const tempData = data.filter((d) => d.temperature !== null);
 		const humidData = data.filter((d) => d.humidity !== null);
+    const lightData = data.filter((d) => d.light !== null);
 
 		const tempLabels = tempData.map((d) => new Date(d.time).toLocaleTimeString());
 		const tempValues = tempData.map((d) => d.temperature);
 
 		const humidLabels = humidData.map((d) => new Date(d.time).toLocaleTimeString());
 		const humidValues = humidData.map((d) => d.humidity);
+
+    const lightLabels = humidData.map((d) => new Date(d.time).toLocaleTimeString());
+		const lightValues = humidData.map((d) => d.humidity);
 
 		if (temperatureChart) {
 			temperatureChart.data.labels = tempLabels;
@@ -119,6 +125,34 @@
 				}
 			});
 		}
+
+    if (lightChart) {
+			lightChart.data.labels = lightLabels;
+			lightChart.data.datasets[0].data = lightValues;
+			lightChart.update("none");
+		} else if (lightCanvas) {
+			lightChart = new Chart(lightCanvas, {
+				type: "line",
+				data: {
+					labels: lightLabels,
+					datasets: [
+						{
+							label: "Light in Lumen",
+							data: lightValues,
+							borderColor: "rgb(255, 99, 132)",
+							backgroundColor: "rgba(255, 99, 132, 0.1)",
+							tension: 0.4,
+							fill: true
+						}
+					]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					animation: false
+				}
+			});
+		}
 	}
 
 	onMount(() => {
@@ -132,6 +166,7 @@
 		if (pollInterval) clearInterval(pollInterval);
 		if (temperatureChart) temperatureChart.destroy();
 		if (humidityChart) humidityChart.destroy();
+    if (lightChart) lightChart.destroy();
 	});
 
 	$: if ($isAuthenticated && !pollInterval) {
@@ -140,7 +175,7 @@
 </script>
 
 <main>
-	<h1>Environmental Monitoring Station TODO add EMS logo</h1>
+	<h1>Environmental Monitoring Station</h1>
 
 	{#if !$isAuthenticated}
 		<div class="login-container">
@@ -177,109 +212,121 @@
 					<h3>Humidity</h3>
 					<canvas bind:this={humidityCanvas}></canvas>
 				</div>
+
+        <div class="chart-container">
+					<h3>Light</h3>
+					<canvas bind:this={lightCanvas}></canvas>
+				</div>
 			</div>
 		</div>
 	{/if}
 </main>
 
 <style>
-	main {
-		max-width: 1200px;
-		margin: 0 auto;
-		padding: 2rem;
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-	}
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
 
-	h1 {
-		text-align: center;
-		color: #333;
-	}
+  h1 {
+    text-align: center;
+    color: #333;
+  }
 
-	.login-container {
-		max-width: 400px;
-		margin: 4rem auto;
-		padding: 2rem;
-		border: 1px solid #ddd;
-		border-radius: 8px;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	}
+  .login-container {
+    max-width: 400px;
+    margin: 4rem auto;
+    padding: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
-	.login-container h2 {
-		margin-top: 0;
-	}
+  .login-container h2 {
+    margin-top: 0;
+  }
 
-	input {
-		width: 100%;
-		padding: 0.75rem;
-		margin: 1rem 0;
-		border: 1px solid #ddd;
-		border-radius: 4px;
-		font-size: 1rem;
-		box-sizing: border-box;
-	}
+  input {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 1rem 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
 
-	button {
-		width: 100%;
-		padding: 0.75rem;
-		background-color: #0066cc;
-		color: white;
-		border: none;
-		border-radius: 4px;
-		font-size: 1rem;
-		cursor: pointer;
-	}
+  button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
 
-	button:hover {
-		background-color: #0052a3;
-	}
+  button:hover {
+    background-color: #0052a3;
+  }
 
-	.dashboard {
-		margin-top: 2rem;
-	}
+  .dashboard {
+    margin-top: 2rem;
+  }
 
-	.header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 2rem;
-	}
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
 
-	.header button {
-		width: auto;
-		padding: 0.5rem 1.5rem;
-	}
+  .header h2 {
+    margin: 0;
+  }
 
-	.charts {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-		gap: 2rem;
-	}
+  .last-update {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.875rem;
+    color: #666;
+  }
 
-	.chart-container {
-		padding: 1.5rem;
-		border: 1px solid #ddd;
-		border-radius: 8px;
-		background: white;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	}
+  .header button {
+    width: auto;
+    padding: 0.5rem 1.5rem;
+  }
 
-	.chart-container h3 {
-		margin-top: 0;
-		color: #333;
-	}
+  .charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 2rem;
+  }
 
-	canvas {
-		max-height: 300px;
-	}
+  .chart-container {
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
 
-	.error {
-		color: #d32f2f;
-		margin: 1rem 0;
-		padding: 0.75rem;
-		background-color: #ffebee;
-		border-radius: 4px;
-	}
+  .chart-container h3 {
+    margin-top: 0;
+    color: #333;
+  }
+
+  canvas {
+    max-height: 300px;
+  }
+
+  .error {
+    color: #d32f2f;
+    margin: 1rem 0;
+    padding: 0.75rem;
+    background-color: #ffebee;
+    border-radius: 4px;
+  }
 </style>

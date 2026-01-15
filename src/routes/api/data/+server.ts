@@ -11,14 +11,15 @@ export const GET: RequestHandler = async ({ request }) => {
 	}
 
 	try {
-		let query = "SELECT timestamp, temperature, humidity FROM sensor_readings ORDER BY timestamp DESC";
+		let query = "SELECT timestamp, temperature, humidity, light FROM sensor_readings ORDER BY timestamp DESC";
 		const result = await pool.query(query);
 
 		// Transform data for frontend
 		const data = result.rows.map((row) => ({
 			time: row.timestamp,
 			temperature: row.temperature,
-			humidity: row.humidity
+			humidity: row.humidity,
+      light: row.light,
 		}));
 
 		return json({ data });
