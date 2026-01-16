@@ -18,13 +18,14 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ error: "Temperature, humidity or light required" }, { status: 400 });
 		}
 
-		await pool.query(
+		let r = await pool.query(
 			`INSERT INTO sensor_readings (temperature, humidity, light, timestamp)
        VALUES ($1, $2, $3, NOW())
        RETURNING id, timestamp, temperature, humidity, light`,
 			[temperature ?? null, humidity ?? null, light ?? null]
 		);
 
+    console.log("Upserted", r)
 		return json({
 			success: true,
 			message: "Data upserted"
