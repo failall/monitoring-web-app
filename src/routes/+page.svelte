@@ -67,8 +67,8 @@
 		const humidLabels = humidData.map((d) => new Date(d.time).toLocaleTimeString());
 		const humidValues = humidData.map((d) => d.humidity);
 
-    const lightLabels = humidData.map((d) => new Date(d.time).toLocaleTimeString());
-		const lightValues = humidData.map((d) => d.humidity);
+    const lightLabels = lightData.map((d) => new Date(d.time).toLocaleTimeString());
+		const lightValues = lightData.map((d) => d.light);
 
 		if (temperatureChart) {
 			temperatureChart.data.labels = tempLabels;
